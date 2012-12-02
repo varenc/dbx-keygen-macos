@@ -5,7 +5,10 @@ import ctypes
 import ctypes.util
 import os
 import hmac
-import simplejson
+try:
+    import simplejson
+except ImportError:
+    import json as simplejson
 import struct
 import base64
 # requires pip install pbkdf2
@@ -42,7 +45,7 @@ class KeyStoreFileBacked(object):
     def obfuscate(self, data):
         encryptor = AES.new(key=self._s, mode=AES.MODE_CBC, IV=self._i)
         return encryptor.encrypt(data)
-    
+
     def _unobfuscate_low(self, data, key):
         decryptor = AES.new(key, mode=AES.MODE_CBC, IV=self._i)
         return decryptor.decrypt(data)
@@ -77,7 +80,7 @@ class KeyStoreFileBacked(object):
         # Manually remove AES-CBC padding ...
         pad = -(ord(payload[-1]))
         payload = payload[:pad]
-        
+
         self._dict = simplejson.loads(payload)
         return
 
@@ -147,19 +150,19 @@ class DBKeyStore(object):
 
     def __init__(self, appdata_path):
         self.parsers = {0: Version0()}
-        self.hmac_keys = dict(((v, self.parsers[v].USER_HMAC_KEY) for v in self.parsers))        
+        self.hmac_keys = dict(((v, self.parsers[v].USER_HMAC_KEY) for v in self.parsers))
         self.ks = KeyStore(appdata_path)
         # simplified version
         # ...
         return
-    
+
     def get_user_key(self):
         version, user_key = self.ks.get_versioned_key(CLIENT_KEY_NAME, self.hmac_keys)
         # Original displays dropbox_hash() instead
         print 'KEYSTORE: got user key (%d, %s)' % (version, binascii.hexlify(user_key))
         return (version, user_key)
 
-    
+
 # ---------------------------------------------
 
 appdata_path = os.path.expanduser(u'~/.%s' % BUILD_KEY.lower())
