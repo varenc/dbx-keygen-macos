@@ -98,37 +98,12 @@ class KeyStoreFileBacked(object):
             raise Exception('No Data')
         return self.unversionify_payload(data, hmac_keys)
 
-# --------------------------------------------------
-# Taken from common_util/keystore/keystore_linux.py
-
-class S(ctypes.Structure):
-    _fields_ = [('r1', ctypes.c_ulong),
-     ('r2', ctypes.c_ulong),
-     ('b1', ctypes.c_ulong),
-     ('b2', ctypes.c_ulong),
-     ('b3', ctypes.c_ulong),
-     ('f1', ctypes.c_ulong),
-     ('f2', ctypes.c_ulong),
-     ('f3', ctypes.c_ulong),
-     ('s1', ctypes.c_ulong),
-     ('s2', ctypes.c_int * 128)]
-
-r1 = ctypes.cdll.LoadLibrary(ctypes.util.find_library('c'))
-s = r1.statvfs
-s.restype = ctypes.c_int
-s.argtypes = [ctypes.c_char_p, ctypes.POINTER(S)]
-
 class KeyStore(KeyStoreFileBacked):
 
     def unique_id(self, path):
         inode = os.stat(path).st_ino
-        v = S()
-        ret = s(path, ctypes.byref(v))
-        if ret < 0:
-            raise Exception('statvfs failed with retval %s' % (ret,))
-        # NOTE: original version displays dropbox_hash() instead
-        print 'KEYSTORE: unique_id = %r %s %s ' % ( path, '%d' % inode, '%d' % v.s1)
-        return '%d_%d' % (inode, v.s1)
+        print 'KEYSTORE: unique_id = %r %s'  % (path, '%d' % inode)
+        return ('%d' % inode).encode('ascii')
 
 # ---------------------------------------------
 # ...
