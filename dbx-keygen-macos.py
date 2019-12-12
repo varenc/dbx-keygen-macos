@@ -168,12 +168,13 @@ class DBKeyStore(object):
 
 
 # ---------------------------------------------
+for key in ['instance1', 'instance_db']:
+  print "Key %s" % key
+  appdata_path = os.path.expanduser(u'~/.%s/%s' % (BUILD_KEY.lower(), key))
+  dbks = DBKeyStore(appdata_path)
+  user_key = dbks.get_user_key()
+  print "User key: ", binascii.hexlify( user_key[1] )
 
-appdata_path = os.path.expanduser(u'~/.%s' % BUILD_KEY.lower())
-dbks = DBKeyStore(appdata_path)
-user_key = dbks.get_user_key()
-print "User key: ", binascii.hexlify( user_key[1] )
-
-v0 = Version0()
-db_key = v0.get_database_key(user_key[1])
-print "Database key: ", binascii.hexlify( db_key )
+  v0 = Version0()
+  db_key = v0.get_database_key(user_key[1])
+  print "Database key: ", binascii.hexlify( db_key )
