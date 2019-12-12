@@ -25,6 +25,10 @@ CLIENT_KEY_NAME = u'Client'
 # NOTE: original version is based on ncrypt
 # http://pypi.python.org/pypi/ncrypt/
 
+import crypto
+import sys
+sys.modules['Crypto'] = crypto
+
 #CIPHER_TYPE = CipherType('AES-128', 'CBC')
 from Crypto.Cipher import AES
 
